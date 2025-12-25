@@ -1,0 +1,8 @@
+python-telegram-bot==20.3
+APScheduler==3.10.4
+tzlocal==5.2
+requests
+beautifulsoup4
+python-docx
+playwright
+python-dotenv
