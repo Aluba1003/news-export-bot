@@ -121,12 +121,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         logger.info(f"加入新聞：{title} ({url})")
 
-def main():
-    token = get_token()
-    application = Application.builder().token(token).job_queue(None).build()
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    logger.info("Bot 啟動中（run_polling）…")
-    application.run_polling()
-
+def main(): 
+    token = get_token() 
+    application = Application.builder().token(token).build() 
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message)) 
+    # ✅ Webhook 模式 
+    port = int(os.environ.get("PORT", 8080)) # Cloud Run 會自動提供 PORT 
+    application.run_webhook( 
+        listen="0.0.0.0", 
+        port=port, 
+        url_path=token, # 用 token 當路徑，避免隨便人呼叫 
+        webhook_url=f"https://{os.environ.get('CLOUD_RUN_URL')}/{token}" 
+        # 這裡要填 Cloud Run 部署後的公開網址 
+    )
 if __name__ == "__main__":
     main()
